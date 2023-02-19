@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AuthForm extends StatefulWidget {
   const AuthForm({super.key});
@@ -16,6 +19,40 @@ class _AuthFormState extends State<AuthForm> {
   var _username = '';
   bool _isLoginPage = false;
   //--------------------------------------------
+
+  startauthentication() {
+    final validity = _formkey.currentState!.validate();
+    FocusScope.of(context).unfocus();
+
+    if (validity) {
+      _formkey.currentState!.save();
+      submitform(_email, _password, _username);
+    }
+  }
+
+  submitform(String email, String password, String username) async {
+    final auth = FirebaseAuth.instance;
+    UserCredential authResult;
+
+    try {
+      if (_isLoginPage) {
+        authResult = await auth.signInWithEmailAndPassword(
+            email: email, password: password);
+      } else {
+        authResult = await auth.createUserWithEmailAndPassword(
+            email: email, password: password);
+        String uid = authResult.user!.uid;
+        await FirebaseFirestore.instance.collection('users').doc(uid).set({
+          'username': username,
+          'email': email,
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+  }
+
+  //---------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -133,6 +170,21 @@ class _AuthFormState extends State<AuthForm> {
                                 fontSize: 16,
                               ),
                             ),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isLoginPage != _isLoginPage;
+                        });
+                      },
+                      child: _isLoginPage
+                          ? Text('Not a Member')
+                          : Text('Already a Member?'),
                     ),
                   )
                 ],
