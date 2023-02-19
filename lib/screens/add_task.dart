@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class AddTask extends StatefulWidget {
   const AddTask({super.key});
@@ -9,6 +13,29 @@ class AddTask extends StatefulWidget {
 }
 
 class _AddTaskState extends State<AddTask> {
+  //-----------------------------------------
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  //-----------------------------------------
+  addtaskoffirebase() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    final User user = await auth.currentUser();
+    String uid = user.uid;
+    var time = DateTime.now();
+    await FirebaseFirestore.instance
+        .collection('tasks')
+        .doc(uid)
+        .collection('mytask')
+        .doc(time.toString())
+        .set({
+      'title': titleController.text,
+      'description': descriptionController.text,
+      'time': time.toString(),
+    });
+    Fluttertoast.showToast(msg: 'Data Added');
+  }
+
+  //----------------------------------------
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,6 +48,7 @@ class _AddTaskState extends State<AddTask> {
           children: [
             Container(
               child: TextField(
+                controller: titleController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Enter Title',
@@ -32,6 +60,7 @@ class _AddTaskState extends State<AddTask> {
             ),
             Container(
               child: TextField(
+                controller: descriptionController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Enter Description',
@@ -52,7 +81,9 @@ class _AddTaskState extends State<AddTask> {
                       return Colors.purple.shade100;
                     return Theme.of(context).primaryColor;
                   })),
-                  onPressed: () {},
+                  onPressed: () {
+                    addtaskoffirebase();
+                  },
                   child: Text(
                     'Add Task',
                     style: GoogleFonts.roboto(fontSize: 18),
