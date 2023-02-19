@@ -13,6 +13,8 @@ class _AuthFormState extends State<AuthForm> {
   final _formkey = GlobalKey<FormState>();
   var _email = '';
   var _password = '';
+  var _username = '';
+  bool _isLoginPage = false;
   //--------------------------------------------
 
   @override
@@ -33,6 +35,31 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
+                  if (!_isLoginPage)
+                    TextFormField(
+                      keyboardType: TextInputType.emailAddress,
+                      key: ValueKey('username'),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Incorrect Username';
+                        }
+                        return null;
+                      },
+                      onSaved: (value) {
+                        _username = value.toString();
+                      },
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: new BorderRadius.circular(8.0),
+                          borderSide: new BorderSide(),
+                        ),
+                        labelText: 'Enter Username',
+                        labelStyle: GoogleFonts.roboto(),
+                      ),
+                    ),
+                  SizedBox(
+                    height: 10,
+                  ),
                   TextFormField(
                     keyboardType: TextInputType.emailAddress,
                     key: ValueKey('email'),
@@ -53,6 +80,9 @@ class _AuthFormState extends State<AuthForm> {
                       labelText: 'Enter Email',
                       labelStyle: GoogleFonts.roboto(),
                     ),
+                  ),
+                  SizedBox(
+                    height: 10,
                   ),
                   TextFormField(
                     keyboardType: TextInputType.emailAddress,
@@ -75,6 +105,36 @@ class _AuthFormState extends State<AuthForm> {
                       labelStyle: GoogleFonts.roboto(),
                     ),
                   ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    padding: EdgeInsets.all(5),
+                    height: 70,
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {},
+                      child: _isLoginPage
+                          ? Text(
+                              'Login',
+                              style: GoogleFonts.roboto(
+                                fontSize: 16,
+                              ),
+                            )
+                          : Text(
+                              'Sign Up',
+                              style: GoogleFonts.roboto(
+                                fontSize: 16,
+                              ),
+                            ),
+                    ),
+                  )
                 ],
               ),
             ),
