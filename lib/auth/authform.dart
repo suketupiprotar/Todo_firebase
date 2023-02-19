@@ -33,12 +33,13 @@ class _AuthFormState extends State<AuthForm> {
   submitform(String email, String password, String username) async {
     final auth = FirebaseAuth.instance;
     UserCredential authResult;
-
+     print("isLoding  ${_isLoginPage}");
     try {
       if (_isLoginPage) {
         authResult = await auth.signInWithEmailAndPassword(
             email: email, password: password);
       } else {
+        print("email:-${email}password:-${password}");
         authResult = await auth.createUserWithEmailAndPassword(
             email: email, password: password);
         String uid = authResult.user!.uid;
@@ -84,6 +85,7 @@ class _AuthFormState extends State<AuthForm> {
                       },
                       onSaved: (value) {
                         _username = value.toString();
+                        print(_username);
                       },
                       decoration: InputDecoration(
                         border: OutlineInputBorder(
@@ -122,6 +124,7 @@ class _AuthFormState extends State<AuthForm> {
                     height: 10,
                   ),
                   TextFormField(
+                    obscureText: true,
                     keyboardType: TextInputType.emailAddress,
                     key: ValueKey('password'),
                     validator: (value) {
@@ -156,7 +159,9 @@ class _AuthFormState extends State<AuthForm> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        startauthentication();
+                      },
                       child: _isLoginPage
                           ? Text(
                               'Login',
